@@ -1,11 +1,6 @@
-## My Project
+# Amazon Containers Workshop
 
-TODO: Fill this README out!
-
-Be sure to:
-
-* Change the title in this README
-* Edit your repository description on GitHub
+This is part of an Amazon Containers workshop at https://ecsworkshop.com or https://eksworkshop.com
 
 ## Security
 
