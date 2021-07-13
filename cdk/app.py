@@ -56,21 +56,15 @@ class AmpService(core.Stack):
 
         self.base_platform = BasePlatform(self, self.stack_name)
 
-
         file = open("ecs-fargate-adot-config.yaml")
         adot_config = file.read()
         file.close()
-
 
         exec_role = aws_iam.Role(
             self, 'AmpAppTaskExecutionRole-',
             assumed_by=aws_iam.ServicePrincipal('ecs-tasks.amazonaws.com'))
         exec_role.add_managed_policy(aws_iam.ManagedPolicy.from_aws_managed_policy_name('service-role/AmazonECSTaskExecutionRolePolicy'))
-        exec_role.add_managed_policy(aws_iam.ManagedPolicy.from_aws_managed_policy_name('CloudWatchLogsFullAccess'))
         exec_role.add_managed_policy(aws_iam.ManagedPolicy.from_aws_managed_policy_name('AmazonSSMReadOnlyAccess'))
-
-
-
 
         self.fargate_task_def = aws_ecs.TaskDefinition(
             self, "aws-otel-FargateTask",
@@ -94,11 +88,11 @@ class AmpService(core.Stack):
         )
 
         self.container = self.fargate_task_def.add_container(
-            "AmpContainerDef",
+            "prometheus-sample-app",
             image=aws_ecs.ContainerImage.from_registry("public.ecr.aws/pkashlik/prometheus-sample-app:latest"),
             memory_reservation_mib=256,
             logging=aws_ecs.LogDriver.aws_logs(
-                stream_prefix='/ecs/ecs-aws-otel-sidecar-app-cdk'
+                stream_prefix='/ecs/prometheus-sample-app-cdk'
             ),
             environment={
                 "REGION": getenv('AWS_REGION')
