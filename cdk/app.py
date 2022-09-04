@@ -41,7 +41,7 @@ class AmpService(cdk.Stack):
 
         self.otel_container = self.fargate_task_def.add_container(
             "aws-otel-collector",
-            image=ecs.ContainerImage.from_registry("public.ecr.aws/aws-observability/aws-otel-collector:latest"),
+            image=ecs.ContainerImage.from_registry("public.ecr.aws/aws-observability/aws-otel-collector:v0.20.0"),
             memory_reservation_mib=512,
             logging=ecs.LogDriver.aws_logs(
                 stream_prefix='/ecs/ecs-aws-otel-sidecar-collector-cdk',
