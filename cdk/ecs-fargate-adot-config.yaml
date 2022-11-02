@@ -28,34 +28,34 @@ processors:
           - ecs.task.storage.write_bytes
   metricstransform: # update metric names
     transforms:
-      - metric_name: ecs.task.memory.utilized
+      - include: ecs.task.memory.utilized
         action: update
         new_name: MemoryUtilized
-      - metric_name: ecs.task.memory.reserved
+      - include: ecs.task.memory.reserved
         action: update
         new_name: MemoryReserved
-      - metric_name: ecs.task.memory.usage
+      - include: ecs.task.memory.usage
         action: update
         new_name: MemoryUsage
-      - metric_name: ecs.task.cpu.utilized
+      - include: ecs.task.cpu.utilized
         action: update
         new_name: CpuUtilized
-      - metric_name: ecs.task.cpu.reserved
+      - include: ecs.task.cpu.reserved
         action: update
         new_name: CpuReserved
-      - metric_name: ecs.task.cpu.usage.vcpu
+      - include: ecs.task.cpu.usage.vcpu
         action: update
         new_name: CpuUsage
-      - metric_name: ecs.task.network.rate.rx
+      - include: ecs.task.network.rate.rx
         action: update
         new_name: NetworkRxBytes
-      - metric_name: ecs.task.network.rate.tx
+      - include: ecs.task.network.rate.tx
         action: update
         new_name: NetworkTxBytes
-      - metric_name: ecs.task.storage.read_bytes
+      - include: ecs.task.storage.read_bytes
         action: update
         new_name: StorageReadBytes
-      - metric_name: ecs.task.storage.write_bytes
+      - include: ecs.task.storage.write_bytes
         action: update
         new_name: StorageWriteBytes
   resource:
@@ -81,13 +81,10 @@ processors:
       - key: aws.ecs.task.family
         action: delete
 exporters:
-  awsprometheusremotewrite:
+  prometheusremotewrite:
     endpoint: {{endpoint}}
-    aws_auth:
-      region: {{region}}
-      service: "aps"
-    resource_to_telemetry_conversion:
-      enabled: true
+    auth:
+      authenticator: sigv4auth
   logging:
     loglevel: debug
 extensions:
@@ -96,13 +93,15 @@ extensions:
     endpoint: :1888
   zpages:
     endpoint: :55679
+  sigv4auth:
+    region: {{region}}
 service:
-  extensions: [pprof, zpages, health_check]
+  extensions: [pprof, zpages, health_check, sigv4auth]
   pipelines:
     metrics:
       receivers: [prometheus]
-      exporters: [logging, awsprometheusremotewrite]
+      exporters: [logging, prometheusremotewrite]
     metrics/ecs:
       receivers: [awsecscontainermetrics]
       processors: [filter]
-      exporters: [logging, awsprometheusremotewrite]
+      exporters: [logging, prometheusremotewrite]
