@@ -1,5 +1,10 @@
+import aws_cdk as cdk
+
 from aws_cdk import (
-    core as cdk,
+    App,
+    Aspects,
+    Aws,
+    Environment,
     aws_ec2 as ec2,
     aws_ecs as ecs,
     aws_ecr_assets as ecr_a,
