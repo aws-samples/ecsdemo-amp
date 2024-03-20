@@ -31,7 +31,12 @@ class AmpService(cdk.Stack):
             self, "aws-otel-FargateTask",
             compatibility=ecs.Compatibility.EC2_AND_FARGATE,
             cpu='256',
-            memory_mib='1024'
+            memory_mib='1024',
+            # Uncomment to use on ARM64
+            # runtime_platform=ecs.RuntimePlatform(
+            #     operating_system_family=ecs.OperatingSystemFamily.LINUX,
+            #     cpu_architecture=ecs.CpuArchitecture.ARM64
+            # )
         )
 
         self.adot_log_grp = logs.LogGroup(
@@ -74,6 +79,9 @@ class AmpService(cdk.Stack):
             environment={
                 "REGION": getenv('AWS_REGION')
             },
+            port_mappings=[
+                ecs.PortMapping(container_port=8080)
+            ],
         )
 
         self.fargate_service = ecs.FargateService(
